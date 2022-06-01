@@ -14,6 +14,9 @@ outputs:
   filename:
     description: "Copy of inputs.filename, to re-use it for other jobs"
     value: ${{ inputs.filename }}
+  body:
+    description: "Tag details without the subject"
+    value: ${{ steps.publish.outputs.body }}
 
 runs:
   using: composite
@@ -59,3 +62,4 @@ runs:
 
           core.setOutput('checksum', require('crypto').createHash('sha256').update(source).digest('hex'));
           core.setOutput('download', update.data.assets[0].browser_download_url);
+          core.setOutput('body', release_body);
