@@ -27,7 +27,7 @@ runs:
 
     - name: Publish release
       id: publish
-      uses: actions/github-script@v4
+      uses: actions/github-script@v6
       with:
         script: |
           const fs = require('fs');
@@ -36,7 +36,7 @@ runs:
 
           const source = fs.readFileSync('${{ inputs.filename }}');
 
-          const release = await github.repos.createRelease({
+          const release = await github.rest.repos.createRelease({
               owner: context.repo.owner, repo: context.repo.repo,
               tag_name: version, name: version, body: release_body, draft: true
               });
@@ -44,7 +44,7 @@ runs:
           /* We get a lot of connection reset errors... */
           for (let retry = 0; retry < 5; retry++) {
               try {
-                  const upload = await github.repos.uploadReleaseAsset({
+                  const upload = await github.rest.repos.uploadReleaseAsset({
                       owner: context.repo.owner, repo: context.repo.repo, release_id: release.data.id,
                       name: '${{ inputs.filename }}', headers: {'Content-Type': 'application/x-xz'}, data: source});
                   break;
@@ -56,7 +56,7 @@ runs:
               }
           }
 
-          const update = await github.repos.updateRelease({
+          const update = await github.rest.repos.updateRelease({
             owner: context.repo.owner, repo: context.repo.repo, release_id: release.data.id,
             draft: false});
 
